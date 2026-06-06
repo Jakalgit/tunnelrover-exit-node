@@ -1,0 +1,9 @@
+services:
+  xray:
+    image: teddysun/xray:latest
+    container_name: xray-exit
+    restart: unless-stopped
+    volumes:
+      - ./config.json:/etc/xray/config.json:ro
+    ports:
+      - "443:443"
