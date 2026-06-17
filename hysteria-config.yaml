@@ -1,0 +1,24 @@
+# Exit Hysteria2 — простая нода (аналог config.json для xray).
+#
+# 1. DNS: A-запись домена → IP этого VPS
+# 2. TLS: ./deploy.sh или положи fullchain.pem + privkey.pem в ./certs/
+# 3. Добавь UUID middle-нод в auth.userpass (тот же UUID, что exit.auth на middle)
+
+listen: :443
+
+tls:
+  cert: /etc/hysteria/certs/fullchain.pem
+  key: /etc/hysteria/certs/privkey.pem
+
+auth:
+  type: password
+  password: "REPLACE_RELAY_UUID"
+
+masquerade:
+  type: proxy
+  proxy:
+    url: https://www.cloudflare.com
+
+bandwidth:
+  up: 1 gbps
+  down: 1 gbps

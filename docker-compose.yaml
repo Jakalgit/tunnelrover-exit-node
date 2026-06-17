@@ -1,9 +1,12 @@
 services:
-  xray:
-    image: teddysun/xray:latest
-    container_name: xray-exit
+  hysteria:
+    image: tobyxdd/hysteria:latest
+    container_name: hysteria-exit
     restart: unless-stopped
-    volumes:
-      - ./config.json:/etc/xray/config.json:ro
     ports:
-      - "443:443"
+      - "443:443/udp"
+      - "443:443/tcp"
+    volumes:
+      - ./hysteria-config.yaml:/etc/hysteria/config.yaml:ro
+      - ./certs:/etc/hysteria/certs:ro
+    command: server -c /etc/hysteria/config.yaml
