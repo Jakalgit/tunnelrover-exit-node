@@ -126,18 +126,16 @@ for line in text.splitlines():
     if ":" not in line:
         continue
     key, value = line.split(":", 1)
-    key = key.strip().lower().replace(" ", "")
+    key = "".join(ch for ch in key.split("(", 1)[0].lower() if ch.isalpha())
     value = value.strip()
     if key in ("privatekey", "private"):
         private = value
-    elif key == "publickey":
-        public = value
-    elif key == "password" and not public:
+    elif key in ("publickey", "password", "public") and value:
         public = value
 if not private or not public:
     raise SystemExit("Could not parse xray x25519 output:\n" + text)
-print(f"PRIVATE_KEY={shlex.quote(private)}")
-print(f"PUBLIC_KEY={shlex.quote(public)}")
+print(f"declare -g PRIVATE_KEY={shlex.quote(private)}")
+print(f"declare -g PUBLIC_KEY={shlex.quote(public)}")
 PY
 )" || exit 1
     eval "$parsed"
@@ -194,6 +192,11 @@ PY
 
 install_docker
 ensure_reality_keys
+
+if [[ -z "$PRIVATE_KEY" || -z "$PUBLIC_KEY" ]]; then
+  echo "REALITY key was not written. deploy/nodes.json privateKey and publicKey are empty." >&2
+  exit 1
+fi
 
 export NODE_NAME RELAY_UUID DEST PRIVATE_KEY SERVER_NAMES_JSON SHORT_IDS_JSON
 export ROOT="$SCRIPT_DIR"
