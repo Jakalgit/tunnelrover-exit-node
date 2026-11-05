@@ -36,7 +36,8 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 load_config() {
-  eval "$(python3 - "$NODES_FILE" <<'PY'
+  local parsed
+  parsed="$(python3 - "$NODES_FILE" <<'PY'
 import json, shlex, sys
 
 with open(sys.argv[1], encoding="utf-8") as f:
@@ -81,7 +82,8 @@ print(f"PUBLIC_KEY={q(cfg.get('publicKey') or '')}")
 print("SERVER_NAMES_JSON=" + shlex.quote(json.dumps(names)))
 print("SHORT_IDS_JSON=" + shlex.quote(json.dumps(short_ids)))
 PY
-)"
+)" || exit 1
+  eval "$parsed"
 }
 
 load_config
@@ -107,15 +109,16 @@ install_docker() {
 
 ensure_reality_keys() {
   local short_count
-  short_count="$(python3 -c 'import json,os,sys; print(len(json.loads(os.environ["SHORT_IDS_JSON"])))')"
+  short_count="$(python3 -c 'import json,sys; print(len(json.loads(sys.argv[1])))' "$SHORT_IDS_JSON")" || exit 1
   if [[ -n "$PRIVATE_KEY" && -n "$PUBLIC_KEY" && "$short_count" -gt 0 ]]; then
     return
   fi
 
   if [[ -z "$PRIVATE_KEY" || -z "$PUBLIC_KEY" ]]; then
     local output
-    output="$(docker run --rm teddysun/xray xray x25519)"
-    eval "$(python3 - "$output" <<'PY'
+    output="$(docker run --rm teddysun/xray xray x25519)" || exit 1
+    local parsed
+    parsed="$(python3 - "$output" <<'PY'
 import shlex, sys
 text = sys.argv[1]
 private = public = None
@@ -136,7 +139,8 @@ if not private or not public:
 print(f"PRIVATE_KEY={shlex.quote(private)}")
 print(f"PUBLIC_KEY={shlex.quote(public)}")
 PY
-)"
+)" || exit 1
+    eval "$parsed"
   fi
 
   if [[ "$short_count" -eq 0 ]]; then
