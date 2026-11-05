@@ -1,0 +1,18 @@
+listen: :443
+
+tls:
+  cert: /etc/hysteria/certs/fullchain.pem
+  key: /etc/hysteria/certs/privkey.pem
+
+auth:
+  type: password
+  password: "{{RELAY_UUID}}"
+
+masquerade:
+  type: proxy
+  proxy:
+    url: {{MASQUERADE_URL}}
+
+bandwidth:
+  up: {{BANDWIDTH_UP}}
+  down: {{BANDWIDTH_DOWN}}

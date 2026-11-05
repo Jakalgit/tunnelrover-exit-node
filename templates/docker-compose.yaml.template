@@ -1,0 +1,12 @@
+services:
+  hysteria:
+    image: tobyxdd/hysteria:latest
+    container_name: hysteria-exit-{{NODE_NAME}}
+    restart: unless-stopped
+    ports:
+      - "443:443/udp"
+      - "443:443/tcp"
+    volumes:
+      - {{ROOT}}/generated/hysteria-config.yaml:/etc/hysteria/config.yaml:ro
+      - {{ROOT}}/certs:/etc/hysteria/certs:ro
+    command: server -c /etc/hysteria/config.yaml

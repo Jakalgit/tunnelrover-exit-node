@@ -11,10 +11,12 @@ middle-node (РФ) ──Hysteria2──► exit-node (этот репозито
 
 | Файл | Назначение |
 |------|------------|
-| `hysteria-config.yaml` | Конфиг сервера (TLS, relay UUID) |
-| `docker-compose.yaml` | Один контейнер `hysteria-exit` |
+| `deploy/nodes.json` | Домен, relay UUID, email certbot, masquerade, bandwidth |
+| `templates/hysteria-config.yaml.template` | Шаблон сервера, скрипт его не меняет |
+| `templates/docker-compose.yaml.template` | Шаблон compose, скрипт его не меняет |
+| `generated/` | Собранные конфиги, пересоздаются при каждом запуске |
 | `certs/` | `fullchain.pem` + `privkey.pem` (Let's Encrypt) |
-| `deploy.sh` | Получить сертификат для домена |
+| `deploy.sh` | Сертификат и `docker compose up` |
 
 ## 1. Домен
 
@@ -24,35 +26,22 @@ middle-node (РФ) ──Hysteria2──► exit-node (этот репозито
 exit-nl-1.tunnelrover.com  →  IP exit VPS
 ```
 
-## 2. Relay UUID (кто может подключаться)
-
-В `hysteria-config.yaml` укажи UUID middle-ноды — тот же, что `exit.auth` на middle:
-
-```yaml
-auth:
-  type: password
-  password: "7f3a9c2e-4b1d-4e8a-9f0c-123456789abc"
-```
-
-Одна exit-нода = один relay UUID (как один `clients[]` в xray). Несколько middle — отдельные exit VPS или ветка `tunnelrover-node/hysteria` с Redis.
-
-## 3. TLS
+## 2. Конфиг
 
 ```bash
-export DOMAIN=exit-nl-1.tunnelrover.com
+cp deploy/nodes.example.json deploy/nodes.json
+```
+
+`relayUuid` — тот же UUID, что `exit.auth` на middle. Одна exit-нода = один relay UUID. Несколько middle — отдельные exit VPS.
+
+## 3. Запуск
+
+```bash
 chmod +x deploy.sh
 sudo ./deploy.sh
 ```
 
-Или вручную положи сертификаты в `certs/fullchain.pem` и `certs/privkey.pem`.
-
-## 4. Запуск
-
-```bash
-docker compose up -d
-```
-
-Проверка: `443/udp` и `443/tcp` открыты на firewall.
+Повторный запуск безопасен: файлы в `templates/` только читаются, корневые `hysteria-config.yaml` и `docker-compose.yaml` скрипт не меняет, `generated/` собирается заново, certbot пропускается, если сертификат для домена уже есть. Проверка: `443/udp` и `443/tcp` открыты на firewall.
 
 ## Связка с middle-node
 
@@ -71,7 +60,7 @@ docker compose up -d
 
 | | `main` (xray) | `hysteria` |
 |--|---------------|------------|
-| Конфиг | `config.json` | `hysteria-config.yaml` |
+| Конфиг | `config.json` | `deploy/nodes.json` |
 | Клиенты | `clients[].id` (UUID) | `auth.password` (UUID relay) |
 | Порт | 443 TCP | 443 UDP+TCP |
 | REALITY | да | нет (обычный TLS) |

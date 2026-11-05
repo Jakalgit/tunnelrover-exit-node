@@ -1,8 +1,5 @@
-# Exit Hysteria2 — простая нода (аналог config.json для xray).
-#
-# 1. DNS: A-запись домена → IP этого VPS
-# 2. TLS: ./deploy.sh или положи fullchain.pem + privkey.pem в ./certs/
-# 3. Добавь UUID middle-нод в auth.userpass (тот же UUID, что exit.auth на middle)
+# Reference copy. deploy.sh renders templates/hysteria-config.yaml.template
+# from deploy/nodes.json into generated/hysteria-config.yaml and does not modify this file.
 
 listen: :443
 

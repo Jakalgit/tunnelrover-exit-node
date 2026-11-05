@@ -1,0 +1,11 @@
+{
+  "name": "exit-nl-1",
+  "domain": "exit-nl-1.tunnelrover.com",
+  "relayUuid": "REPLACE_RELAY_UUID",
+  "certbotEmail": "info@tunnelrover.com",
+  "masqueradeUrl": "https://www.cloudflare.com",
+  "bandwidth": {
+    "up": "1 gbps",
+    "down": "1 gbps"
+  }
+}
