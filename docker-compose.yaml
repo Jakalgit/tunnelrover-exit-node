@@ -1,3 +1,5 @@
+# Reference copy. deploy.sh renders templates/docker-compose.yaml.template
+# into generated/docker-compose.yaml and does not modify this file.
 services:
   xray:
     image: teddysun/xray:latest

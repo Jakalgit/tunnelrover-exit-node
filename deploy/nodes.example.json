@@ -1,0 +1,9 @@
+{
+  "name": "exit-nl-1",
+  "relayUuid": "REPLACE_RELAY_UUID",
+  "dest": "www.microsoft.com:443",
+  "serverNames": ["www.microsoft.com"],
+  "privateKey": "",
+  "publicKey": "",
+  "shortIds": []
+}
