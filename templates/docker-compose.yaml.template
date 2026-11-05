@@ -1,0 +1,32 @@
+version: "3.9"
+
+networks:
+  exit-network:
+    name: exit-network
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-exit-{{NODE_NAME}}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - {{ROOT}}/generated/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - {{ROOT}}/nginx-certs:/etc/nginx/certs:ro
+      - {{ROOT}}/index.html:/etc/nginx/html/index.html:ro
+    depends_on:
+      - xray
+    networks:
+      - exit-network
+
+  xray:
+    image: teddysun/xray:latest
+    container_name: xray-exit-{{NODE_NAME}}
+    restart: unless-stopped
+    volumes:
+      - {{ROOT}}/generated/config.json:/etc/xray/config.json:ro
+    command: xray run -config /etc/xray/config.json
+    networks:
+      - exit-network

@@ -10,11 +10,13 @@ middle-node-xhttp ──xhttp/TLS──► exit-node (этот репо) ──�
 
 | Файл | Назначение |
 |------|------------|
-| `templates/config.json.template` | xray exit: xhttp inbound + freedom |
-| `templates/nginx.conf.template` | TLS + proxy path → xray |
-| `deploy.sh` | certbot + генерация `config.json`, `nginx.conf` |
-| `docker-compose.yaml` | `nginx` + `xray` |
+| `deploy/nodes.json` | Домен, relay UUID, path и mode xhttp |
+| `templates/config.json.template` | Шаблон xray, скрипт его не меняет |
+| `templates/nginx.conf.template` | Шаблон nginx, скрипт его не меняет |
+| `templates/docker-compose.yaml.template` | Шаблон compose, скрипт его не меняет |
+| `generated/` | Собранные конфиги, пересоздаются при каждом запуске |
 | `nginx-certs/` | Let's Encrypt (gitignored) |
+| `deploy.sh` | Сертификат и `docker compose up` |
 
 ## 1. DNS
 
@@ -22,25 +24,22 @@ middle-node-xhttp ──xhttp/TLS──► exit-node (этот репо) ──�
 exit-nl-1.tunnelrover.com  →  IP exit VPS
 ```
 
-## 2. Relay UUID
-
-UUID middle-ноды — тот же, что `exit.id` в `tunnelrover-node/deploy/nodes.json`:
+## 2. Конфиг
 
 ```bash
-export DOMAIN=exit-nl-1.tunnelrover.com
-export RELAY_UUID=7f3a9c2e-4b1d-4e8a-9f0c-123456789abc
-export XHTTP_PATH=/assets/build/_app/immutable/chunks/
-export XHTTP_MODE=packet-up
-sudo ./deploy.sh
+cp deploy/nodes.example.json deploy/nodes.json
 ```
+
+`relayUuid` — тот же UUID, что `exit.id` на middle. `xhttpPath` и `xhttpMode` должны совпадать с middle.
 
 ## 3. Запуск
 
 ```bash
-docker compose up -d
+chmod +x deploy.sh
+sudo ./deploy.sh
 ```
 
-Порты: `80`, `443`.
+Повторный запуск безопасен: файлы в `templates/` только читаются, корневой `docker-compose.yaml` скрипт не меняет, `generated/` собирается заново, certbot пропускается, если сертификат для домена уже есть. Порты: `80`, `443`.
 
 ## Связка с middle-node-xhttp
 

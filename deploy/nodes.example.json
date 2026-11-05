@@ -1,0 +1,8 @@
+{
+  "name": "exit-nl-1",
+  "domain": "exit-nl-1.tunnelrover.com",
+  "relayUuid": "REPLACE_RELAY_UUID",
+  "certbotEmail": "info@tunnelrover.com",
+  "xhttpPath": "/assets/build/_app/immutable/chunks/",
+  "xhttpMode": "packet-up"
+}
